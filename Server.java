@@ -98,49 +98,54 @@ public class Server {
 
                 // takes message until null terminator
                 while ((message = in.readLine()) != null) {
-                    // if (message.length() > 10) {
-                    //     out.println("There was an exception on the server");
-                    // }
-
+                    
                     // tries 
                     try {
-                        // parses the 
+                        // parses the message into an integer
                         int input = Integer.parseInt(message); 
         
+                        // calls the factor method
                         int ans = factor(input);
         
+                        // prints the number of factors
                         out.println("The number " + input + " has " + ans + " factors"); 
                     } catch (NumberFormatException e) {
+                        // catches if there is a number too large and sends the correct error message
                         System.err.println("Error parsing input: " + e.getMessage());
                         out.println("There was an exception on the server");
                     }
-
-
-                    int input = Integer.parseInt(message);
-                    int ans = factor(input);                    
-                    out.println("The number " + input + " has " + ans + " factors"); 
                 }
             } catch (Exception e) {
+                // typical catches
                 System.err.println("Error handling client: " + e.getMessage());
             } finally {
                 try {
+                    // closes server
                     clientSocket.close();
                 } catch (Exception e) {
+                    // catch error 
                     System.err.println("Error closing client connection: " + e.getMessage());
                 }
             }
         }
     }
 
+    // performs the actual math
     public int factor(int input) {
-        int count = 0;
 
+        // number of factors
+        int count = 0;  
+
+        // for every number until the input number
         for(int i = 1; i <= input ; i++) {
+
+            // if it is a factor, increment count
             if(input % i == 0) {
                 count++;
             }
         }
 
+        // return count
         return count;
     }
 }

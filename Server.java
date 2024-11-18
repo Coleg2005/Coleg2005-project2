@@ -14,19 +14,16 @@ public class Server {
     public Server(int port) {
         try {
             server = new ServerSocket(port);
-            System.out.println("Server started on port " + port);
         } catch (Exception e) {
             System.err.println("Failed to start server: " + e.getMessage());
         }
     }
 
     public void serve(int clients) {
-        System.out.println("Waiting for clients...");
         for (int i = 0; i < clients; i++) {
             try {
                 Socket clientSocket = server.accept();
                 connectionTimes.add(LocalDateTime.now());
-                System.out.println("Client connected: " + clientSocket.getRemoteSocketAddress());
 
                 // Handle client in a separate thread
                 new ClientHandler(clientSocket).start();
@@ -40,7 +37,6 @@ public class Server {
         try {
             if (server != null) {
                 server.close();
-                System.out.println("Server shut down.");
             }
         } catch (Exception e) {
             System.err.println("Error shutting down server: " + e.getMessage());
@@ -63,26 +59,33 @@ public class Server {
                 PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
                 BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))
             ) {
+
+                String code = in.readLine();
+                if (code == null || !code.equals("12345")) {
+                    // If the code is invalid, disconnect the client
+                    out.println("couldn't handshake");
+                    clientSocket.close();
+                    return;
+                }
+
                 String message;
                 while ((message = in.readLine()) != null) {
 
-                    System.out.println("This is the message: " + message);
+                    if (message.length() > 10) {
+                        out.println("There was an exception on the server");
+                    }
 
-                    int input = (int)message.toCharArray()[0];
+                    int input = Integer.parseInt(message);
 
                     int ans = factor(input);
-                    System.out.println("Received: " + message);
-
-
                     
-                    out.println("The number " + input + " has " + ans + " factors"); // Echo the message back to the client
+                    out.println("The number " + input + " has " + ans + " factors"); 
                 }
             } catch (Exception e) {
                 System.err.println("Error handling client: " + e.getMessage());
             } finally {
                 try {
                     clientSocket.close();
-                    System.out.println("Client disconnected: " + clientSocket.getRemoteSocketAddress());
                 } catch (Exception e) {
                     System.err.println("Error closing client connection: " + e.getMessage());
                 }
@@ -91,15 +94,10 @@ public class Server {
     }
 
     public int factor(int input) {
-
         int count = 0;
 
-        for(int i = 1; i < input/2; i++) {
+        for(int i = 1; i <= input ; i++) {
             if(input % i == 0) {
-
-                if(i != input / i) {
-                    count++;
-                }
                 count++;
             }
         }

@@ -12,7 +12,6 @@ public class Client {
     public Client(String host, int port) {
         try {
             socket = new Socket(host, port);
-            System.out.println("Connected to server");
             out = new DataOutputStream(socket.getOutputStream());
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         } catch (Exception e) {
@@ -29,15 +28,8 @@ public class Client {
             out.writeBytes("12345\n");
             
             out.flush();
-            System.out.println("Handshake sent.");
-            System.out.println("Before read in");
-            socket.setSoTimeout(1000);
-            System.out.println("Server response: " + in.readLine());
-            System.out.println("After read in");
 
         } catch (Exception e) {
-            System.out.println("In error");
-
             System.err.println("Error during handshake: " + e.getMessage());
         }
     }
@@ -46,10 +38,7 @@ public class Client {
         try {
             out.writeBytes(message + "\n");
             out.flush();
-            socket.setSoTimeout(1000);
             String response = in.readLine();
-            System.out.println("Request sent: " + message);
-            System.out.println("Server response: " + response);
             return response;
         } catch (Exception e) {
             System.err.println("Error sending request: " + e.getMessage());
@@ -62,7 +51,6 @@ public class Client {
             if (out != null) out.close();
             if (in != null) in.close();
             if (socket != null) socket.close();
-            System.out.println("Disconnected from server");
         } catch (Exception e) {
             System.err.println("Error closing connection: " + e.getMessage());
         }
